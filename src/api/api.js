@@ -89,6 +89,39 @@ export const changePassword = async (oldPassword, newPassword) => {
   }
 };
 
+// forgotPasswordAPI
+export const forgotPasswordAPI = async (email) => {
+  try {
+    const { data } = await custom_request.post("/auth/forgot_password", { email });
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+}
+
+// resetPasswordAPI
+export const resetPasswordAPI = async ({ token, newPassword }) => {
+  try {
+    const { data } = await custom_request.post("/auth/reset_password", { token, newPassword });
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+}
+
+// verifyResetTokenAPI
+export const verifyResetTokenAPI = async (token) => {
+  try {
+    const { data } = await custom_request.post("/auth/verifyresettoken", { token });
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+}
+
 // ✅ Logout (clears HttpOnly cookie from server)
 export const logout = async () => {
   try {
@@ -99,6 +132,98 @@ export const logout = async () => {
     return null;
   }
 };
+
+// 🧩 src/api/api.js
+
+// ✅ Upload Images
+export const uploadImageAPI = async (files) => {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+
+    const { data } = await custom_request.post("/img/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log(data, "asdasd");
+    return data;
+
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+// ✅ Delete Images
+export const deleteImageAPI = async (body) => {
+  try {
+    const { data } = await custom_request.delete("/img/delete", { data: body });
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+// DashboardStats
+export const DashboardStats = async () => {
+  try {
+    const { data } = await custom_request.get("/dash/all");
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+
+// 🧠 BLOGS API
+
+// ✅ Add Blog
+export const addBlogAPI = async (formData) => {
+  try {
+    const { data } = await custom_request.post("/blogs/add", formData);
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+// ✅ Get All Blogs
+export const getBlogsAPI = async () => {
+  try {
+    const { data } = await custom_request.get("/blogs/all");
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+// ✅ Edit Blog
+export const editBlogAPI = async (id, formData) => {
+  try {
+    const { data } = await custom_request.put(`/blogs/edit/${id}`, formData);
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+// ✅ Delete Blog
+export const deleteBlogAPI = async (id) => {
+  try {
+    const { data } = await custom_request.delete(`/blogs/delete/${id}`);
+    return data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
 
 // ===================================================
 // 🔹 Utility

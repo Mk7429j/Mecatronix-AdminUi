@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   BarChart3,
@@ -8,17 +8,81 @@ import {
   Bell,
   Mail,
   Package,
+  UserCog,
 } from "lucide-react";
+import { DashboardStats } from "../../api/api"; // ✅ your API function
 
 const Dash = () => {
-  const stats = [
-    { icon: FileText, label: "Blogs", value: "32", color: "from-blue-500 to-cyan-400" },
-    { icon: Package, label: "Banners", value: "8", color: "from-violet-500 to-purple-400" },
-    { icon: Bell, label: "New Offers", value: "5", color: "from-rose-500 to-orange-400" },
-    { icon: Users, label: "Enquiries", value: "27", color: "from-emerald-500 to-green-400" },
-    { icon: Star, label: "Reviews", value: "114", color: "from-yellow-400 to-orange-300" },
-    { icon: Mail, label: "Subscribers", value: "341", color: "from-red-500 to-pink-400" },
-  ];
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const HandleFetch = async () => {
+    try {
+      const result = await DashboardStats();
+      if (result?.success) setStats(result.data);
+    } catch (error) {
+      console.error("Dashboard fetch failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    HandleFetch();
+  }, []);
+
+  const cards = stats
+    ? [
+        {
+          icon: FileText,
+          label: "Blogs",
+          value: stats.blogs,
+          color: "from-blue-500 to-cyan-400",
+        },
+        {
+          icon: Package,
+          label: "Banners",
+          value: stats.banners,
+          color: "from-violet-500 to-purple-400",
+        },
+        {
+          icon: Users,
+          label: "Clients",
+          value: stats.clients,
+          color: "from-green-500 to-emerald-400",
+        },
+        {
+          icon: Bell,
+          label: "Enquiries",
+          value: stats.enquiries.total,
+          color: "from-rose-500 to-orange-400",
+        },
+        {
+          icon: Star,
+          label: "Reviews",
+          value: stats.reviews.total,
+          color: "from-yellow-400 to-orange-300",
+        },
+        {
+          icon: Mail,
+          label: "Subscribers",
+          value: stats.subscribers,
+          color: "from-red-500 to-pink-400",
+        },
+        {
+          icon: UserCog,
+          label: "Admins",
+          value: stats.admins.total,
+          color: "from-indigo-500 to-sky-400",
+        },
+        {
+          icon: BarChart3,
+          label: "Projects",
+          value: stats.projects,
+          color: "from-fuchsia-500 to-pink-400",
+        },
+      ]
+    : [];
 
   return (
     <div className="space-y-10">
@@ -36,26 +100,30 @@ const Dash = () => {
       </motion.div>
 
       {/* Stats Cards */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {stats.map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
-            whileHover={{ scale: 1.03 }}
-            className="bg-zinc-900/80 border border-zinc-800 backdrop-blur-xl p-5 rounded-xl shadow-lg hover:shadow-[0_0_25px_rgba(239,68,68,0.15)] transition-all"
-          >
-            <div
-              className={`w-12 h-12 rounded-lg bg-gradient-to-tr ${stat.color} flex items-center justify-center mb-3`}
+      {loading ? (
+        <p className="text-gray-400 text-center mt-10">Loading dashboard...</p>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {cards.map((card, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ scale: 1.03 }}
+              className="bg-zinc-900/80 border border-zinc-800 backdrop-blur-xl p-5 rounded-xl shadow-lg hover:shadow-[0_0_25px_rgba(239,68,68,0.15)] transition-all"
             >
-              <stat.icon className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-gray-400 text-sm">{stat.label}</h3>
-            <p className="text-2xl font-semibold text-white mt-1">{stat.value}</p>
-          </motion.div>
-        ))}
-      </div>
+              <div
+                className={`w-12 h-12 rounded-lg bg-gradient-to-tr ${card.color} flex items-center justify-center mb-3`}
+              >
+                <card.icon className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-gray-400 text-sm">{card.label}</h3>
+              <p className="text-2xl font-semibold text-white mt-1">{card.value}</p>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Charts Section */}
       <div className="grid lg:grid-cols-2 gap-8">
@@ -87,16 +155,16 @@ const Dash = () => {
             <Bell className="text-orange-400 w-5 h-5" />
           </div>
           <ul className="space-y-3 text-sm text-gray-400">
-            <li>📝 New blog post published — <span className="text-gray-200">AI & Drones</span></li>
-            <li>🎯 New offer launched — <span className="text-gray-200">Festive Combo</span></li>
-            <li>📬 5 new subscribers joined today</li>
-            <li>⭐ 3 new reviews received</li>
-            <li>💬 2 new enquiries pending</li>
+            <li>📝 {stats?.blogs || 0} total blogs posted</li>
+            <li>📬 {stats?.subscribers || 0} active subscribers</li>
+            <li>⭐ {stats?.reviews.total || 0} total reviews</li>
+            <li>💬 {stats?.enquiries.unopened || 0} new enquiries pending</li>
+            <li>👑 {stats?.admins.superadmin || 0} superadmins registered</li>
           </ul>
         </motion.div>
       </div>
 
-      {/* Footer Text */}
+      {/* Footer */}
       <div className="text-center text-gray-500 text-sm pt-6 border-t border-zinc-800">
         © {new Date().getFullYear()} Mecatrone Admin Dashboard • Powered by{" "}
         <span className="text-red-500 font-semibold">Mecatrone</span>

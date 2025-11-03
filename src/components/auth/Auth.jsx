@@ -55,8 +55,8 @@ const Auth = () => {
       console.error("Login Error:", err);
       errorNotification(
         _.get(err, "response.data.message") ||
-          _.get(err, "message") ||
-          "Authentication failed. Please try again."
+        _.get(err, "message") ||
+        "Authentication failed. Please try again."
       );
     } finally {
       setLoading(false);
@@ -158,14 +158,24 @@ const Auth = () => {
             whileTap={{ scale: 0.96 }}
             whileHover={{ scale: 1.02 }}
             disabled={loading}
-            className={`w-full mt-6 py-2.5 rounded-lg font-semibold tracking-wide text-white transition-all ${
-              loading
-                ? "bg-zinc-700 cursor-not-allowed"
-                : "bg-gradient-to-r from-red-600 to-orange-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] hover:shadow-[0_0_30px_rgba(239,68,68,0.6)]"
-            }`}
+            className={`w-full mt-6 py-2.5 rounded-lg font-semibold tracking-wide text-white transition-all ${loading
+              ? "bg-zinc-700 cursor-not-allowed"
+              : "bg-gradient-to-r from-red-600 to-orange-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] hover:shadow-[0_0_30px_rgba(239,68,68,0.6)]"
+              }`}
           >
             {loading ? "Authenticating..." : "Login"}
           </motion.button>
+
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-xs text-red-400 hover:text-red-300 transition"
+            >
+              Forgot password?
+            </button>
+          </div>
+
         </form>
 
         {/* 🔻 Footer */}

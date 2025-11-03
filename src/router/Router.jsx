@@ -16,6 +16,8 @@ import Subscribers from "../pages/subscribers/Subscribers";
 
 // 🔹 API
 import { checkLoginStatus } from "../api/api";
+import ForgotPassword from "../components/auth/ForgotPassword";
+import ResetPassword from "../components/auth/ResetPassword";
 
 // ===================================================
 // 🔸 Private Route Wrapper (For Protected Admin Pages)
@@ -49,8 +51,8 @@ const PrivateRoute = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen text-gray-500">
-        Loading ...
+      <div className="flex items-center justify-center h-screen text-gray-400 text-lg">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-red-500"></div>
       </div>
     );
   }
@@ -67,7 +69,14 @@ const router = createBrowserRouter([
     path: "/",
     element: <Auth />,
   },
-
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/reset-password/:token",
+    element: <ResetPassword />,
+  },
   // 🔹 Protected Admin Routes
   {
     element: <PrivateRoute />,
